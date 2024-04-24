@@ -1,5 +1,5 @@
 import { FieldError, FieldValues, Path, UseFormRegister } from "react-hook-form";
-import { Interest } from "./models";
+import { Gender, Interest } from "./models";
 
 
 export type DefaultFormField = {
@@ -17,6 +17,7 @@ export type DefaultFormField = {
 export type OnboardingFormData = {
     firstname: string;
     age: number;
+    gender: Gender;
 };
 
 export type InterestFormData = {

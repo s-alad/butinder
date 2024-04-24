@@ -18,11 +18,18 @@ const RedirectBasedOnAuth = ({ children }: { children: React.ReactNode }) => {
      * This is a higher level component who's job it is to redirect the user to the home page if they are not authenticated but attempt to navigate to a protected route.
      */
     const [calledPush, setCalledPush] = useState(false);
-    const { user, logout, googlesignin, terrier } = useAuth();
+    const { user, logout, googlesignin, terrier, loading } = useAuth();
     const router = useRouter();
     const currentRoute = router.asPath; // this shows the route you are currently in
 
     useEffect(() => {
+
+        if (loading) {
+            return;
+        } else {
+            console.log(terrier); 
+        }
+
         if (protectedRoutes.includes(currentRoute)) {
             if ((!user && !calledPush)) {
                 setCalledPush(true);
@@ -45,9 +52,19 @@ const RedirectBasedOnAuth = ({ children }: { children: React.ReactNode }) => {
         } else if (currentRoute === "/") {
             console.log("current route is /");
             if (user) {
-                console.log("pushing to matchmaking");
-                setCalledPush(true);
-                router.push("/matchmaking");
+                console.log(terrier);
+                if (terrier && !terrier.onboarded) {
+                    console.log("pushing to onboarding");
+                    setCalledPush(true);
+                    router.push("/onboarding");
+                    return;
+                } else {
+                    console.log("pushing to matchmaking");
+                    setCalledPush(true);
+                    router.push("/matchmaking");
+                }
+
+
                 return;
             } else {
                 console.log("no user");

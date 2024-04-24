@@ -13,3 +13,6 @@ export const Interests = [
     "Writing",
 ] as const;
 export type Interest = typeof Interests[number];
+
+export const Genders = [ "male", "female", "nonbinary", "other"] as const;
+export type Gender = typeof Genders[number];

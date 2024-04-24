@@ -10,6 +10,7 @@ export default function Home() {
   const router = useRouter();
 	const { user, status, googlesignin, logout } = useAuth();
 
+
   return (
     <>
       <Head>
@@ -25,13 +26,6 @@ export default function Home() {
           user ?
             <div className={s.welcomeback}>
               welcome back {user.displayName?.split(" ")[0]} {"💘"}
-              <button className={s.googlesignin}
-                onClick={() => {
-                  router.push("/matchmaking");
-                }}
-              >
-                matchmaking
-              </button>
             </div>
             :
             <button className={s.googlesignin}

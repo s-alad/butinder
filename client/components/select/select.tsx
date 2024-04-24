@@ -24,7 +24,7 @@ export default function Select<T extends FieldValues>({ type, inputstyle, label,
                     })
                 }
             </select>
-            {error && <span className={s.error}>{error.message}</span>}
+            {error && <span className={s.error}>*{error.message}</span>}
         </div>
     )
 }

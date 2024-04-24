@@ -6,6 +6,12 @@ export default function Matchmaking() {
 
     const { user, logout } = useAuth();
 
+    if (!user) {
+        return (
+            <></>
+        )
+    }
+
     return (
         <div>
             <h1>Matchmaking</h1>

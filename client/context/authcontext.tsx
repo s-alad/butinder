@@ -67,7 +67,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 	function logout() { signOut(auth); router.push("/"); setTerrier(null); };
 
 	useEffect(() => {
-		const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+		const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
 			if (currentUser?.email?.split("@")[1] == "bu.edu" || currentUser == null) {
 				setUser(currentUser);
 
@@ -76,11 +76,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 				} else {
 					// check if user is onboarded by getting user from firestore and checking onboarded field
 					const userRef = doc(db, "users", currentUser?.email || "");
-					const docSnap = getDoc(userRef).then((doc) => {
-						const data = doc.data();
-						const onboarded: boolean | undefined = data?.onboarded;
-						setTerrier({ onboarded: onboarded || false, user: currentUser });
-					});
+					const docSnap = await getDoc(userRef)
+					const data = docSnap.data();
+					const onboarded: boolean | undefined = data?.onboarded;
+					setTerrier({ onboarded: onboarded || false, user: currentUser });
+
 				}
 			} else {
 				router.push("/"); 
