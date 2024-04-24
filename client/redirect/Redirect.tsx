@@ -9,6 +9,8 @@ import { get } from "http";
 // Many of these routes do not exits yet. That's okay (:
 const protectedRoutes = [
     "/matchmaking",
+    "/profile",
+    "/onboarding",
 ];
 
 const RedirectBasedOnAuth = ({ children }: { children: React.ReactNode }) => {
@@ -16,7 +18,7 @@ const RedirectBasedOnAuth = ({ children }: { children: React.ReactNode }) => {
      * This is a higher level component who's job it is to redirect the user to the home page if they are not authenticated but attempt to navigate to a protected route.
      */
     const [calledPush, setCalledPush] = useState(false);
-    const { user, logout, googlesignin } = useAuth();
+    const { user, logout, googlesignin, terrier } = useAuth();
     const router = useRouter();
     const currentRoute = router.asPath; // this shows the route you are currently in
 
@@ -27,8 +29,32 @@ const RedirectBasedOnAuth = ({ children }: { children: React.ReactNode }) => {
                 router.push("/");
                 return;
             }
-        } 
-    }, [calledPush, currentRoute, router]);
+
+            if (terrier && !terrier.onboarded && currentRoute !== "/onboarding") {
+                console.log("pushing to onboarding");
+                setCalledPush(true);
+                router.push("/onboarding");
+                return;
+            } else if (terrier && terrier.onboarded && currentRoute === "/onboarding") {
+                console.log("pushing to matchmaking");
+                setCalledPush(true);
+                router.push("/matchmaking");
+                return;
+            }
+
+        } else if (currentRoute === "/") {
+            console.log("current route is /");
+            if (user) {
+                console.log("pushing to matchmaking");
+                setCalledPush(true);
+                router.push("/matchmaking");
+                return;
+            } else {
+                console.log("no user");
+            }
+        }
+
+    }, [calledPush, currentRoute, router, terrier]);
 
     return children;
 };

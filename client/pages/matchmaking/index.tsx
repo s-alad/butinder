@@ -1,13 +1,16 @@
+import { useAuth } from '@/context/authcontext';
 import Link from 'next/link';
 
 
 export default function Matchmaking() {
+
+    const { user, logout } = useAuth();
+
     return (
         <div>
             <h1>Matchmaking</h1>
-            <Link href="/profile">
-            <button type="button">Edit Profile</button>
-            </Link>
+            <p>Welcome, {user?.displayName}</p>
+            <button onClick={logout}>Logout</button>    
         </div>
         
     )

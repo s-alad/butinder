@@ -6,13 +6,23 @@ import {
 	GoogleAuthProvider,
 } from "firebase/auth";
 
+import { db } from "@/firebase/config";
+import { collection, doc, getDoc, getDocs, setDoc, query, where } from "firebase/firestore";
+
 import { User } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { useRouter } from "next/router";
 
-interface IAuthContext {
-	status: "nonbu" | "bu" | "loading" | null;
+interface Terrier {
+	onboarded: boolean;
 	user: User | null;
+}
+
+interface IAuthContext {
+	status: "nonbu" | "bu" | null;
+	terrier: Terrier | null;
+	user: User | null;
+	loading: boolean;
 	googlesignin: () => void;
 	logout: () => void;
 }
@@ -20,6 +30,8 @@ interface IAuthContext {
 const AuthContext = createContext<IAuthContext>({
 	status: null,
 	user: null,
+	terrier: null,
+	loading: false,
 	googlesignin: () => { },
 	logout: () => { },
 });
@@ -31,8 +43,12 @@ export function useAuth() {
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log("auth provider");
 	let router = useRouter();
+
+	const [terrier, setTerrier] = useState<Terrier | null>(null);
 	const [user, setUser] = useState<User | null>(null);
-	const [status, setStatus] = useState<"nonbu" | "bu" | "loading" | null>(null);
+	const [status, setStatus] = useState<"nonbu" | "bu" | null>(null);
+	const [loading, setLoading] = useState<boolean>(true);
+
 
 	function googlesignin() {
         console.log("signing in with google!");
@@ -48,22 +64,36 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 			console.log(error);
 		});
 	};
-	function logout() { signOut(auth); router.push("/"); };
+	function logout() { signOut(auth); router.push("/"); setTerrier(null); };
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
 			if (currentUser?.email?.split("@")[1] == "bu.edu" || currentUser == null) {
-				setUser(currentUser);	
+				setUser(currentUser);
+
+				if (currentUser == null) { 
+					setTerrier(null);
+				} else {
+					// check if user is onboarded by getting user from firestore and checking onboarded field
+					const userRef = doc(db, "users", currentUser?.email || "");
+					const docSnap = getDoc(userRef).then((doc) => {
+						const data = doc.data();
+						const onboarded: boolean | undefined = data?.onboarded;
+						setTerrier({ onboarded: onboarded || false, user: currentUser });
+					});
+				}
 			} else {
 				router.push("/"); 
 			}
+			setLoading(false);
 		});
 		return () => unsubscribe();
 	}, [user]);
 
 	return (
-		<AuthContext.Provider value={{ user, status, googlesignin, logout }}>
-			{children}
+		<AuthContext.Provider value={{ user, terrier, status, loading, googlesignin, logout }}>
+			
+			{loading ? "loading..." : children}
 		</AuthContext.Provider>
 	);
 };

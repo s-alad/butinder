@@ -1,17 +1,13 @@
 /**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * triggers at https://firebase.google.com/docs/functions
  */
 
-/* import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger"; */
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
+admin.initializeApp();
+
+// function to add user to firestore on account creation
 export const onAccountCreated = functions.auth.user().onCreate(async (user) => {
     try {
         const {uid, email, displayName} = user;
@@ -21,10 +17,11 @@ export const onAccountCreated = functions.auth.user().onCreate(async (user) => {
             email,
             uid,
             name: displayName,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            submitted: false,
+            createdat: admin.firestore.FieldValue.serverTimestamp(),
+            onboarded: false,
         });
 
+        console.log("-----------------");
         console.log(`User ${email + uid} added to Firestore.`);
     } catch (error) {
         console.error("Error adding user to Firestore:", error);
