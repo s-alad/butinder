@@ -127,7 +127,7 @@ export default function Matchmaking() {
         <main className={s.matchmaking}>
             <h1 className={s.tagline}>Find your True Rhett 😍</h1>
             <section className={s.matchspace}>
-                {!currentmatch && <div className={s.reject} 
+                {!currentmatch && users.length !== 0 && <div className={s.reject} 
                     onClick={async () => { await rejects(0); }}
                 >
                     ❎
@@ -175,7 +175,7 @@ export default function Matchmaking() {
                         <h1>No more users to show</h1>
                     </div> : <></>      
                 }
-                {!currentmatch && <div className={s.like} onClick={async () => { await like(0); }} >
+                {!currentmatch && users.length !== 0 && <div className={s.like} onClick={async () => { await like(0); }} >
                     ❤️
                 </div>}
             </section>
