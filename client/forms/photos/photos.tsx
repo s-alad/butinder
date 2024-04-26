@@ -33,7 +33,7 @@ export default function PhotosForm({ callback }: Props) {
             const reader = new FileReader();
             reader.onload = async () => {
                 const base64 = reader.result?.toString();
-                const response = await fetch("http://localhost:5000/check-explicit", {
+                const response = await fetch(EXPLICIT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
