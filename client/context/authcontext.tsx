@@ -23,6 +23,7 @@ interface IAuthContext {
 	terrier: Terrier | null;
 	user: User | null;
 	loading: boolean;
+	askToRefresh: () => void;
 	googlesignin: () => void;
 	logout: () => void;
 }
@@ -32,6 +33,7 @@ const AuthContext = createContext<IAuthContext>({
 	user: null,
 	terrier: null,
 	loading: false,
+	askToRefresh: () => { },
 	googlesignin: () => { },
 	logout: () => { },
 });
@@ -48,7 +50,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 	const [user, setUser] = useState<User | null>(null);
 	const [status, setStatus] = useState<"nonbu" | "bu" | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [askedToRefresh, setAskedToRefresh] = useState<boolean>(false);
 
+	function askToRefresh() { setAskedToRefresh(!askedToRefresh); }
 
 	function googlesignin() {
         console.log("signing in with google!");
@@ -88,10 +92,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 			setLoading(false);
 		});
 		return () => unsubscribe();
-	}, [user]);
+	}, [user, askedToRefresh]);
 
 	return (
-		<AuthContext.Provider value={{ user, terrier, status, loading, googlesignin, logout }}>
+		<AuthContext.Provider value={{ user, terrier, status, loading, googlesignin, logout, askToRefresh }}>
 			
 			{loading ? "loading..." : children}
 		</AuthContext.Provider>

@@ -1,5 +1,5 @@
-import { FieldError, FieldValues, Path, UseFormRegister } from "react-hook-form";
-import { Gender, Interest } from "./models";
+import { Control, FieldError, FieldValues, Path, UseFormRegister } from "react-hook-form";
+import { Age, Gender, Residence, PGender, College, Year } from "./models";
 
 
 export type DefaultFormField = {
@@ -20,12 +20,20 @@ export type OnboardingFormData = {
     gender: Gender;
 };
 
-export type InterestFormData = {
-    interests: Interest[];
+export type DetailsFormData = {
+    residence: Residence;
+    college: College;
+    year: Year;
+};
+
+export type PreferencesFormData = {
+    p_gender: PGender;
+    p_age: Age[];
 };
 
 export interface GenericFormField<T extends FieldValues> extends DefaultFormField{
     register: UseFormRegister<T>;
+    control?: Control<T>;
     name: Path<T>;
     customregistername?: Path<string>;
     options?: string[] | number[];

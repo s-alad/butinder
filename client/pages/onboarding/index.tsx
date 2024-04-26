@@ -11,12 +11,20 @@ import Button from "@/components/button/button";
 import { db } from "@/firebase/config";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import InfoForm from "@/forms/info/info";
-import InterestsForm from "@/forms/interests/interests";
+import DetailsForm from "@/forms/details/details";
+import PreferencesForm from "@/forms/preferences/preferences";
+import { useRouter } from "next/router";
 
 export default function Onboarding() {
-    const { user, logout } = useAuth();
+    const router = useRouter();
+    const { user, logout, askToRefresh } = useAuth();
 
     const [stage, setStage] = useState<"info" | "interests" | "preferences" | "complete">("info");
+    async function onboard() {
+        const userDoc = doc(db, "users", user!.email!);
+        await setDoc(userDoc, { onboarded: true }, { merge: true });
+        askToRefresh();
+    }
 
 
     if (!user) return <div>loading...</div>;
@@ -24,14 +32,25 @@ export default function Onboarding() {
     return (
         <section className={s.onboarding}>
             <div className={s.hey}>Hey Terrier, looking good 😉</div>
-            <div className={s.info}>we need some information about you to get started!</div>
+            <div className={s.info}>
+
+                {stage === "info" && <div className={s.progress}>we need some information about you to get started!</div>}
+                {stage === "preferences" && <div className={s.progress}>let's get to know your preferences</div>}
+                {stage === "interests" && <div className={s.progress}>lets get to know you as a terrier</div>}
+                {stage === "complete" && 
+                    <div className={s.progress}>
+                        <div>you're all set to meet your perfect Rhett! 🎉</div>
+                        <Button text="continue" onClick={onboard} />
+                    </div>
+                }
+            </div>
 
 
-            {stage === "info" && <InfoForm callback={
-                () => setStage("interests")
-            }/>}
+            {stage === "info" && <InfoForm callback={() => setStage("preferences")}/>}
 
-            {stage === "interests" && <InterestsForm />}
+            {stage === "preferences" && <PreferencesForm callback={() => setStage("interests")}/>}
+            
+            {stage === "interests" && <DetailsForm callback={() => setStage("complete")}/>}
         </section>
     );
 }

@@ -15,7 +15,7 @@ export default function Select<T extends FieldValues>({ type, inputstyle, label,
                 className={s.matchselect}
                 defaultValue={"select"}
             >
-                <option value="select" disabled>Select your {name}</option>
+                <option value="select" disabled>Select your {placeholder ? placeholder : name}</option>
                 {
                     options?.map((option, index) => {
                         return (

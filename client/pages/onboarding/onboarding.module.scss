@@ -17,6 +17,13 @@
     .info {
         font-size: 20px;
         margin-bottom: 0px;
+
+        .progress {
+            display: flex;
+            flex-direction: column;
+            gap: 100px;
+        }
+
     }
 
     form {

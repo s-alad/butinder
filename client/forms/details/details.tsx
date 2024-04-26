@@ -4,8 +4,8 @@ import Input from "@/components/input/input";
 import Select from "@/components/select/select";
 import { useAuth } from "@/context/authcontext";
 import { db } from "@/firebase/config";
-import { InterestFormData } from "@/validation/form";
-import { Interests } from "@/validation/models";
+import { DetailsFormData } from "@/validation/form";
+import { Colleges, Residences, Years  } from "@/validation/models";
 import { interestSchema } from "@/validation/schema";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,17 +18,17 @@ interface Props {
     callback?: () => void;
 }
 
-export default function InterestsForm({ callback }: Props) {
+export default function DetailsForm({ callback }: Props) {
 
     const { user } = useAuth();
     const [loading, setLoading] = useState<boolean>(false);
 
-    async function onSubmit(data: InterestFormData) {
+    async function onSubmit(data: DetailsFormData) {
         setLoading(true);
         console.log(data);
 
-        /* const payload = {
-            interests: {
+        const payload = {
+            details: {
                 ...data
             }
         }
@@ -36,26 +36,46 @@ export default function InterestsForm({ callback }: Props) {
         const userDoc = doc(db, "users", user!.email!);
         await setDoc(userDoc, payload, { merge: true });
         setLoading(false);
-        callback && callback(); */
+        callback && callback();
     }
 
     const { register, handleSubmit, control, formState: { errors } } =
-        useForm<InterestFormData>({
+        useForm<DetailsFormData>({
             resolver: zodResolver(interestSchema),
             defaultValues: {}
         });
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-                <Select<InterestFormData>
+                <Select<DetailsFormData>
                     type="text"
                     inputstyle="input"
-                    label="your interests"
-                    placeholder="your interests"
-                    name="interests"
+                    label="your year"
+                    placeholder="your year"
+                    name="year"
                     register={register}
-                    error={errors.interests as any}
-                    options={Object.values(Interests)}
+                    error={errors.year as any}
+                    options={Object.values(Years)}
+                />
+                <Select<DetailsFormData>
+                    type="text"
+                    inputstyle="input"
+                    label="your BU area"
+                    placeholder="your area"
+                    name="residence"
+                    register={register}
+                    error={errors.residence as any}
+                    options={Object.values(Residences)}
+                />
+                <Select<DetailsFormData>
+                    type="text"
+                    inputstyle="input"
+                    label="your college"
+                    placeholder="your college"
+                    name="college"
+                    register={register}
+                    error={errors.college as any}
+                    options={Object.values(Colleges)}
                 />
                 <Button text="Submit" type="submit"
                     loading={loading}
