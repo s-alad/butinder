@@ -17,6 +17,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 import s from './photos.module.scss';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { EXPLICIT } from "@/context/switch";
 
 interface Props {
     callback?: () => void;
@@ -33,7 +34,8 @@ export default function PhotosForm({ callback }: Props) {
             const reader = new FileReader();
             reader.onload = async () => {
                 const base64 = reader.result?.toString();
-                const response = await fetch(EXPLICIT, {
+                console.log(EXPLICIT);
+                const response = await fetch(`${EXPLICIT}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
