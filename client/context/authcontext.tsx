@@ -13,6 +13,8 @@ import { User } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { useRouter } from "next/router";
 
+import s from "./authcontext.module.scss";
+
 interface Terrier {
 	onboarded: boolean;
 	user: User | null;
@@ -97,7 +99,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 	return (
 		<AuthContext.Provider value={{ user, terrier, status, loading, googlesignin, logout, askToRefresh }}>
 			
-			{loading ? "loading..." : children}
+			{loading ? <div className={s.load}>loading...</div> : children}
 		</AuthContext.Provider>
 	);
 };

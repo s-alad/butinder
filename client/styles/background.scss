@@ -23,3 +23,9 @@
     50%{background-position:26% 100%}
     100%{background-position:75% 0%}
 }
+
+@mixin center() {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

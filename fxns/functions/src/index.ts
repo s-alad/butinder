@@ -12,6 +12,12 @@ export const onAccountCreated = functions.auth.user().onCreate(async (user) => {
     try {
         const {uid, email, displayName} = user;
 
+        // ensure email ends in bu.edu
+        if (email?.split("@")[1] == "bu.edu") {
+            console.log("not a bu email");
+            return;
+        }
+
         // Add user information to Firestore
         await admin.firestore().collection("users").doc(email || uid).set({
             email,

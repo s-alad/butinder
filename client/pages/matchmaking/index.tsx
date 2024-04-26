@@ -14,6 +14,8 @@ export default function Matchmaking() {
 
     let currentpath = router.pathname;
 
+    const [loading, setLoading] = useState<boolean>(false);
+
     const [users, setUsers] = useState<any[]>([]);
     const [currentmatch, setCurrentMatch] = useState<any>(null);
 
@@ -31,6 +33,9 @@ export default function Matchmaking() {
             console.log("No user data found");
             return;
         }
+
+        const preferredGender = currentUser.preferences.p_gender;
+        const preggeredAges = currentUser.preferences.p_age;
 
         // set the excluded array to the current user's matches and rejected arrays
         const toexclude = [...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!];
@@ -154,7 +159,6 @@ export default function Matchmaking() {
                 }
                 {
                     !currentmatch && users ? users.slice(0, 1).map(user => {
-                        let imagelength = user.photos.length;
                         console.log(user);
                         return <div className={s.person}>
                             <div className={s.name}>
