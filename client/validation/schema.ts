@@ -50,8 +50,8 @@ export const preferencesSchema: ZodType<PreferencesFormData> = z
 export const photosSchema: ZodType<PhotosFormData> = z.object({
     p1: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
     p2: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
-    p3: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
-    p4: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
-    p5: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
-    p6: z.custom<File>((v) => v instanceof File, {message: 'Image is required',})
+    p3: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}).optional(),
+    p4: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}).optional(),
+    p5: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}).optional(),
+    p6: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}).optional(),
 });

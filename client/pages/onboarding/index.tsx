@@ -20,7 +20,7 @@ export default function Onboarding() {
     const router = useRouter();
     const { user, logout, askToRefresh } = useAuth();
 
-    const [stage, setStage] = useState<"info" | "preferences" | "interests" | "photos" | "complete">("photos");
+    const [stage, setStage] = useState<"info" | "preferences" | "interests" | "photos" | "complete">("info");
     async function onboard() {
         const userDoc = doc(db, "users", user!.email!);
         await setDoc(userDoc, { onboarded: true }, { merge: true });
@@ -54,7 +54,7 @@ export default function Onboarding() {
             
             {stage === "interests" && <DetailsForm callback={() => setStage("photos")}/>}
 
-            {stage === "photos" && <PhotosForm />}
+            {stage === "photos" && <PhotosForm callback={() => setStage("complete")}/>}
         </section>
     );
 }

@@ -19,6 +19,9 @@ export const onAccountCreated = functions.auth.user().onCreate(async (user) => {
             name: displayName,
             createdat: admin.firestore.FieldValue.serverTimestamp(),
             onboarded: false,
+            matched: [],
+            rejected: [],
+            liked: [],
         });
 
         console.log("-----------------");

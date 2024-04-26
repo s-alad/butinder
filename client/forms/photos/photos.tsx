@@ -59,7 +59,8 @@ export default function PhotosForm({ callback }: Props) {
         console.log(data);
 
         // check if the images are unique
-        let images = Object.values(data);
+        let images = Object.values(data).filter((image) => (image !== undefined))
+        console.log(images);
         let inames = images.map((image) => image.name);
         let unique = new Set(inames);
         if (unique.size !== inames.length) {
@@ -75,10 +76,9 @@ export default function PhotosForm({ callback }: Props) {
         await Promise.all(images.map(image => {
             return checkexplicit(image).catch(() => {
                 console.log("naughty image");
-                setStatus("naughty image detected");
+                setStatus("no boobs allowed >:(");
                 setLoading(false);
                 failed = true;
-                
             });
         }))
         if (failed) {return;}
@@ -104,7 +104,7 @@ export default function PhotosForm({ callback }: Props) {
 
 
         setLoading(false);
-        /* callback && callback(); */
+        callback && callback();
     }
 
     const { register, handleSubmit, control, formState: { errors } } =

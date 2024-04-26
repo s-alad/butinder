@@ -34,10 +34,10 @@ export type PreferencesFormData = {
 export type PhotosFormData = {
     p1: File;
     p2: File;
-    p3: File;
-    p4: File;
-    p5: File;
-    p6: File;
+    p3?: File;
+    p4?: File;
+    p5?: File;
+    p6?: File;
 };
 
 export interface GenericFormField<T extends FieldValues> extends DefaultFormField{

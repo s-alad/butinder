@@ -1,10 +1,15 @@
 import { useAuth } from '@/context/authcontext';
 import Link from 'next/link';
+import { BsChatRightHeartFill, BsEmojiHeartEyesFill, BsPersonCircle } from "react-icons/bs";
+import s from './matchmaking.module.scss';
+import { useRouter } from 'next/router';
 
 
 export default function Matchmaking() {
-
+    const router = useRouter();
     const { user, logout } = useAuth();
+
+    let currentpath = router.pathname;
 
     if (!user) {
         return (
@@ -13,11 +18,25 @@ export default function Matchmaking() {
     }
 
     return (
-        <div>
-            <h1>Matchmaking</h1>
-            <p>Welcome, {user?.displayName}</p>
-            <button onClick={logout}>Logout</button>    
-        </div>
+        <main className={s.matchmaking}>
+            <h1 className={s.tagline}>Find your true Rhett 😍</h1>
+            <section className={s.matchspace}>
+                
+            </section>
+            <section className={s.navigation}>
+                <Link href="/matchmaking" 
+                    className={currentpath === "/matchmaking" ? s.active : ""}
+                >
+                    <BsEmojiHeartEyesFill />
+                </Link>
+                <Link href="/chat" className={currentpath === "/chat" ? s.active : ""}>
+                    <BsChatRightHeartFill />
+                </Link>
+                <Link href="/profile" className={currentpath === "/profile" ? s.active : ""}>
+                    <BsPersonCircle />
+                </Link>
+            </section>
+        </main>
         
     )
 }
