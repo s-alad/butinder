@@ -25,18 +25,25 @@ export default function Matchmaking() {
         const currentUser = userSnap.data();
 
         if (!currentUser) {
+            console.log("No user data found");
             return;
         }
 
         // set the excluded array to the current user's matches and rejected arrays
         setExcluded([...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!]);
         console.log([...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!]);
+    
+        await pool();
     }
 
     async function pool() {
         // get all the users from the users collection where the user's id is not the same as the current user's id
         // and where the user's id is not in the current user's matches array
         // and where the user's id is not in the current user's rejected array
+
+        if (excluded.length === 0) {
+            return;
+        }
 
         console.log(excluded);
 
@@ -50,9 +57,7 @@ export default function Matchmaking() {
 
     useEffect(() => {
         async function init() {
-            await exclude().then(() => {
-                pool();
-            })
+            await exclude()
         }
         init();
     }, []);
@@ -163,14 +168,12 @@ export default function Matchmaking() {
                                 <span>{user.details.year}</span>
                             </div>
                         </div>
-                    }) : <div>
-                        <h1>No more users to show</h1>
-                    </div>
+                    }) : <></>
                 }
                 {
-                    users.length === 0 && <div className={s.empty}>
+                    (!currentmatch && users.length === 0) ? <div className={s.empty}>
                         <h1>No more users to show</h1>
-                    </div>
+                    </div> : <></>      
                 }
                 {!currentmatch && <div className={s.like} onClick={async () => { await like(0); }} >
                     ❤️
