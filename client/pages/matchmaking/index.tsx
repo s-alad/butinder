@@ -5,7 +5,7 @@ import s from './matchmaking.module.scss';
 import { useRouter } from 'next/router';
 import { ImCross } from "react-icons/im";
 import { db } from '@/firebase/config';
-import { collection, doc, getDoc, getDocs, limit, query, where } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, getDocs, limit, query, updateDoc, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 export default function Matchmaking() {
@@ -15,6 +15,7 @@ export default function Matchmaking() {
     let currentpath = router.pathname;
 
     const [users, setUsers] = useState<any[]>([]);
+    const [currentmatch, setCurrentMatch] = useState<any>(null);
 
     const [excluded, setExcluded] = useState<string[]>([]);
     async function exclude() {
@@ -28,8 +29,8 @@ export default function Matchmaking() {
         }
 
         // set the excluded array to the current user's matches and rejected arrays
-        setExcluded([...(currentUser.matches || []), ...(currentUser.rejected || [])]);
-        console.log([...(currentUser.matches || []), ...(currentUser.rejected || [])]);
+        setExcluded([...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!]);
+        console.log([...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!]);
     }
 
     async function pool() {
@@ -37,11 +38,10 @@ export default function Matchmaking() {
         // and where the user's id is not in the current user's matches array
         // and where the user's id is not in the current user's rejected array
 
+        console.log(excluded);
+
         const userCollectionRef = collection(db, 'users');
-        const q = query(userCollectionRef,
-            where('email', 'not-in', [user!.email, ...excluded]),
-            limit(10)
-        )
+        const q = query(userCollectionRef, where('email', 'not-in', excluded), limit(10));
         const userSnap = await getDocs(q);
         const users = userSnap.docs.map(doc => doc.data());
         console.log(users);
@@ -50,11 +50,66 @@ export default function Matchmaking() {
 
     useEffect(() => {
         async function init() {
-            await exclude();    
-            await pool();
+            await exclude().then(() => {
+                pool();
+            })
         }
         init();
     }, []);
+
+    async function like(index: number) {
+        if (users.length === 0 || index >= users.length) return;
+
+        const likedUser = users[index];
+        const userDoc = doc(db, "users", user!.email!); // Document reference for the current user
+        const likedUserDoc = doc(db, "users", likedUser.email); // Document reference for the liked user
+
+        // Update the current user's liked array
+        await updateDoc(userDoc, {
+            liked: arrayUnion(likedUser.email)
+        });
+
+        const likedUserData = await getDoc(likedUserDoc);
+        console.log(likedUserData.data());
+        if (likedUserData.exists() && likedUserData.data().liked?.includes(user!.email)) {
+            // It's a match! Both users have liked each other
+            console.log(`It's a match with ${likedUser.info.firstname}!`);
+            // Here you might handle the match event (e.g., send notifications, update match status, etc.)
+
+
+            // Update the current user's matches array
+            await updateDoc(userDoc, {
+                matches: arrayUnion(likedUser.email)
+            });
+
+            // Update the liked user's matches array
+            await updateDoc(likedUserDoc, {
+                matches: arrayUnion(user!.email)
+            });
+            
+            setCurrentMatch(likedUser);
+        }
+
+
+        // After processing, you might want to update the UI or exclude the liked user from future queries
+        setUsers(currentUsers => currentUsers.filter((_, i) => i !== index)); // Remove the liked user from the current users array
+    }
+
+    async function rejects(index: number) {
+        if (users.length === 0 || index >= users.length) return;
+
+        const rejectedUser = users[index];
+        const userDoc = doc(db, "users", user!.email!); // Document reference for the current user
+
+        // Update the current user's rejected array
+        await updateDoc(userDoc, {
+            rejected: arrayUnion(rejectedUser.email)
+        });
+
+        // After processing, you might want to update the UI or exclude the rejected user from future queries
+        setUsers(currentUsers => currentUsers.filter((_, i) => i !== index)); // Remove the rejected user from the current users array
+    }
+    
 
 
     if (!user) {
@@ -67,11 +122,31 @@ export default function Matchmaking() {
         <main className={s.matchmaking}>
             <h1 className={s.tagline}>Find your True Rhett 😍</h1>
             <section className={s.matchspace}>
-                <div className={s.reject}>
+                {!currentmatch && <div className={s.reject} 
+                    onClick={async () => { await rejects(0); }}
+                >
                     ❎
-                </div>
+                </div>}
                 {
-                    users.map((user) => {
+                    currentmatch ? <div className={s.match}>
+                        <div className={s.name}>
+                            {currentmatch.info.firstname}, {currentmatch.info.age}
+                        </div>
+                        <div className={s.exit}
+                            onClick={() => {
+                                setCurrentMatch(null);
+                            }}
+                        >
+                            <ImCross />
+                        </div>
+                        <div className={s.confetti}>
+                            It's a match 🎉
+                        </div>
+                        <img src={currentmatch.photos[0]} />
+                    </div> : <></>
+                }
+                {
+                    !currentmatch && users ? users.slice(0, 1).map(user => {
                         let imagelength = user.photos.length;
                         console.log(user);
                         return <div className={s.person}>
@@ -88,11 +163,18 @@ export default function Matchmaking() {
                                 <span>{user.details.year}</span>
                             </div>
                         </div>
-                    })
+                    }) : <div>
+                        <h1>No more users to show</h1>
+                    </div>
                 }
-                <div className={s.like}>
+                {
+                    users.length === 0 && <div className={s.empty}>
+                        <h1>No more users to show</h1>
+                    </div>
+                }
+                {!currentmatch && <div className={s.like} onClick={async () => { await like(0); }} >
                     ❤️
-                </div>
+                </div>}
             </section>
             <section className={s.navigation}>
                 <Link href="/matchmaking" 

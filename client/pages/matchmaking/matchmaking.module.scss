@@ -28,6 +28,85 @@
         align-items: center;
         gap: 20px;
 
+        .empty {
+            width: 340px;
+            height: 500px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .match {
+            width: 340px;
+            /* height: 500px; */
+            border-radius: 10px;
+            border: 2px solid white;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .name {
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+
+                font-size: 24px;
+                font-weight: bold;
+                color: black;
+                text-align: center;
+                width: 100%;
+                z-index: 99;
+                background-color: white;
+            }
+
+            .exit {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 30px;
+                height: 30px;
+                z-index: 999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                /* background-color: white; */
+                border-radius: 50%;
+                cursor: pointer;
+            }
+
+            img {
+                width: 100%;
+                height: 500px;
+                object-fit: contain;
+                background-color: black;
+                border-radius: 10px;
+            }
+
+            .confetti {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 99;
+                border-radius: 10px;
+                font-size: 30px;
+                font-weight: bold;
+                color: white;
+
+            }
+        }
+
         .person {
             width: 340px;
             /* height: 500px; */
