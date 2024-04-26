@@ -25,6 +25,8 @@ export default function InfoForm({ callback }: Props) {
         setLoading(true);
         console.log(data);
 
+
+
         const payload = {
             info: {
                 firstname: data.firstname,

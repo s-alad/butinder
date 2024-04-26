@@ -69,8 +69,19 @@ export default function PhotosForm({ callback }: Props) {
             return;
         }
 
+        // check that no promises were rejected
+        let failed = false;
         setStatus("making sure no images are naughty...");
-        await Promise.all(images.map(image => checkexplicit(image)));
+        await Promise.all(images.map(image => {
+            return checkexplicit(image).catch(() => {
+                console.log("naughty image");
+                setStatus("naughty image detected");
+                setLoading(false);
+                failed = true;
+                
+            });
+        }))
+        if (failed) {return;}
         setStatus("all good! ...");
 
         // put the image in the storage bucket under the user's email
@@ -83,7 +94,7 @@ export default function PhotosForm({ callback }: Props) {
             })
         });
 
-        const iurls = await Promise.all(uploadPromises);
+        const iurls = await Promise.all(uploadPromises)
         console.log(iurls);
 
         // then update the user's document with the image bucket urls
