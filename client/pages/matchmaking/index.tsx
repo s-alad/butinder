@@ -19,7 +19,7 @@ export default function Matchmaking() {
 
     return (
         <main className={s.matchmaking}>
-            <h1 className={s.tagline}>Find your true Rhett 😍</h1>
+            <h1 className={s.tagline}>Find your True Rhett 😍</h1>
             <section className={s.matchspace}>
                 
             </section>
