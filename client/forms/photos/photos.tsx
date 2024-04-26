@@ -4,7 +4,7 @@ import Input from "@/components/input/input";
 import Select from "@/components/select/select";
 
 import { useAuth } from "@/context/authcontext";
-import { db } from "@/firebase/config";
+import { db, storage } from "@/firebase/config";
 import { PhotosFormData, GenericFormField } from "@/validation/form";
 import { PGenders } from "@/validation/models";
 import { photosSchema, preferencesSchema } from "@/validation/schema";
@@ -16,6 +16,7 @@ import React, { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 import s from './photos.module.scss';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface Props {
     callback?: () => void;
@@ -25,22 +26,71 @@ export default function PhotosForm({ callback }: Props) {
 
     const { user } = useAuth();
     const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>("");
+    const [status, setStatus] = useState<string>("");
+
+    function checkexplicit(image: File) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const base64 = reader.result?.toString();
+                const response = await fetch("http://localhost:5000/check-explicit", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: base64 })
+                });
+    
+                const data = await response.json();
+                if (response.status === 200) {
+                    resolve(data);
+                } else {
+                    reject(data);
+                }
+            };
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(image);
+        });
+    }
 
 
     async function onSubmit(data: PhotosFormData) {
         setLoading(true);
         console.log(data);
 
+        // check if the images are unique
         let images = Object.values(data);
         let inames = images.map((image) => image.name);
         let unique = new Set(inames);
         if (unique.size !== inames.length) {
             console.log("images are not unique");
-            setError("images are not unique");
+            setStatus("images are not unique");
             setLoading(false);
             return;
         }
+
+        setStatus("making sure no images are naughty...");
+        await Promise.all(images.map(image => checkexplicit(image)));
+        setStatus("all good! ...");
+
+        // put the image in the storage bucket under the user's email
+        const uploadPromises = images.map((image) => {
+            const uploadTask = uploadBytes(ref(storage, `${user!.email}/${image.name}`), image);
+            return uploadTask.then((snapshot) => {
+                console.log('Uploaded a blob or file!');
+                console.log(snapshot);
+                return getDownloadURL(snapshot.ref);
+            })
+        });
+
+        const iurls = await Promise.all(uploadPromises);
+        console.log(iurls);
+
+        // then update the user's document with the image bucket urls
+        const payload = { photos: iurls }
+        const userDoc = doc(db, "users", user!.email!);
+        await setDoc(userDoc, payload, { merge: true });
+
 
         setLoading(false);
         /* callback && callback(); */
@@ -102,7 +152,7 @@ export default function PhotosForm({ callback }: Props) {
             </div>
 
 
-            <div className={s.invalid}>{error && error}</div>
+            <div className={s.invalid}>{status && status}</div>
 
 
             <Button text="Submit" type="submit"
