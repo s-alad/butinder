@@ -19,9 +19,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={s.main}>
-        <h1 className={s.action}
-          onClick={() => { console.log(user) }}
-        >Terrier Tinder</h1>
+        <h1 className={s.action} onClick={() => { console.log(user) }}>Terrier Tinder</h1>
+        <div className={s.tagline}>Find your True Rhett at BU 💘</div>
+
         {
           user ?
             <div className={s.welcomeback}>
