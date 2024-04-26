@@ -6,7 +6,7 @@ import { useAuth } from "@/context/authcontext";
 import { db } from "@/firebase/config";
 import { DetailsFormData } from "@/validation/form";
 import { Colleges, Residences, Years  } from "@/validation/models";
-import { interestSchema } from "@/validation/schema";
+import { detailsSchema } from "@/validation/schema";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { doc, setDoc } from "firebase/firestore";
@@ -41,7 +41,7 @@ export default function DetailsForm({ callback }: Props) {
 
     const { register, handleSubmit, control, formState: { errors } } =
         useForm<DetailsFormData>({
-            resolver: zodResolver(interestSchema),
+            resolver: zodResolver(detailsSchema),
             defaultValues: {}
         });
 

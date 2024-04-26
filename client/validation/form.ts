@@ -31,6 +31,15 @@ export type PreferencesFormData = {
     p_age: Age[];
 };
 
+export type PhotosFormData = {
+    p1: File;
+    p2: File;
+    p3: File;
+    p4: File;
+    p5: File;
+    p6: File;
+};
+
 export interface GenericFormField<T extends FieldValues> extends DefaultFormField{
     register: UseFormRegister<T>;
     control?: Control<T>;
@@ -38,4 +47,6 @@ export interface GenericFormField<T extends FieldValues> extends DefaultFormFiel
     customregistername?: Path<string>;
     options?: string[] | number[];
 }
+
+interface PhotosFormGenericField extends GenericFormField<PhotosFormData> {}
 

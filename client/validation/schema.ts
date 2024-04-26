@@ -1,5 +1,5 @@
 import { z, ZodEnum, ZodType } from "zod"; // Add new import
-import { DetailsFormData, OnboardingFormData, PreferencesFormData } from "./form";
+import { DetailsFormData, OnboardingFormData, PhotosFormData, PreferencesFormData } from "./form";
 import { Residences, Genders,  Gender, PGender, PGenders, Ages, Age, Colleges } from "./models";
 
 export const onboardingSchema: ZodType<OnboardingFormData> = z
@@ -14,7 +14,7 @@ export const onboardingSchema: ZodType<OnboardingFormData> = z
 
     })
 
-export const interestSchema: ZodType<DetailsFormData> = z
+export const detailsSchema: ZodType<DetailsFormData> = z
     .object({
         year: z.enum(["Freshman", "Sophomore", "Junior", "Senior"], {
             errorMap: (issue, ctx) => {
@@ -45,3 +45,13 @@ export const preferencesSchema: ZodType<PreferencesFormData> = z
             }
         }),
     })
+
+// there should be a minimum of one photo and a maximum of 6 photos and each string should be unique
+export const photosSchema: ZodType<PhotosFormData> = z.object({
+    p1: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
+    p2: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
+    p3: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
+    p4: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
+    p5: z.custom<File>((v) => v instanceof File, {message: 'Image is required',}),
+    p6: z.custom<File>((v) => v instanceof File, {message: 'Image is required',})
+});

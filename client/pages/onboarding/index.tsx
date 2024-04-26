@@ -14,12 +14,13 @@ import InfoForm from "@/forms/info/info";
 import DetailsForm from "@/forms/details/details";
 import PreferencesForm from "@/forms/preferences/preferences";
 import { useRouter } from "next/router";
+import PhotosForm from "@/forms/photos/photos";
 
 export default function Onboarding() {
     const router = useRouter();
     const { user, logout, askToRefresh } = useAuth();
 
-    const [stage, setStage] = useState<"info" | "interests" | "preferences" | "complete">("info");
+    const [stage, setStage] = useState<"info" | "preferences" | "interests" | "photos" | "complete">("photos");
     async function onboard() {
         const userDoc = doc(db, "users", user!.email!);
         await setDoc(userDoc, { onboarded: true }, { merge: true });
@@ -37,6 +38,7 @@ export default function Onboarding() {
                 {stage === "info" && <div className={s.progress}>we need some information about you to get started!</div>}
                 {stage === "preferences" && <div className={s.progress}>let's get to know your preferences</div>}
                 {stage === "interests" && <div className={s.progress}>lets get to know you as a terrier</div>}
+                {stage === "photos" && <div className={s.progress}>show that face card to the world</div>}
                 {stage === "complete" && 
                     <div className={s.progress}>
                         <div>you're all set to meet your perfect Rhett! 🎉</div>
@@ -50,7 +52,9 @@ export default function Onboarding() {
 
             {stage === "preferences" && <PreferencesForm callback={() => setStage("interests")}/>}
             
-            {stage === "interests" && <DetailsForm callback={() => setStage("complete")}/>}
+            {stage === "interests" && <DetailsForm callback={() => setStage("photos")}/>}
+
+            {stage === "photos" && <PhotosForm />}
         </section>
     );
 }
