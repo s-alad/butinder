@@ -79,12 +79,12 @@ export default function Matchmaking() {
 
             // Update the current user's matches array
             await updateDoc(userDoc, {
-                matches: arrayUnion(likedUser.email)
+                matched: arrayUnion(likedUser.email)
             });
 
             // Update the liked user's matches array
             await updateDoc(likedUserDoc, {
-                matches: arrayUnion(user!.email)
+                matched: arrayUnion(user!.email)
             });
             
             setCurrentMatch(likedUser);
