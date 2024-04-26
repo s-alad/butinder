@@ -19,10 +19,13 @@ export default function Matchmaking() {
 
     const [excluded, setExcluded] = useState<string[]>([]);
     async function exclude() {
+        console.log("Excluding users");
         // get the current user's data, especially the matches and rejected arrays
         const userDoc = doc(db, "users", user!.email!);
         const userSnap = await getDoc(userDoc);
         const currentUser = userSnap.data();
+
+        console.log(currentUser);
 
         if (!currentUser) {
             console.log("No user data found");
@@ -30,13 +33,15 @@ export default function Matchmaking() {
         }
 
         // set the excluded array to the current user's matches and rejected arrays
-        setExcluded([...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!]);
+        const toexclude = [...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!];
+        setExcluded(toexclude);
         console.log([...(currentUser.matched || []), ...(currentUser.rejected || []), ...(currentUser.liked || []), user!.email!]);
     
-        await pool();
+        console.log("pooling")
+        await pool(toexclude);
     }
 
-    async function pool() {
+    async function pool(excluded: any) {
         // get all the users from the users collection where the user's id is not the same as the current user's id
         // and where the user's id is not in the current user's matches array
         // and where the user's id is not in the current user's rejected array
@@ -56,10 +61,7 @@ export default function Matchmaking() {
     }
 
     useEffect(() => {
-        async function init() {
-            await exclude()
-        }
-        init();
+        exclude();
     }, []);
 
     async function like(index: number) {
