@@ -1,0 +1,13 @@
+### Tech
+- Next.js
+- Typescript
+- Zod + RHF
+- SASS
+- Express
+- Node
+- Google Cloud Vision Safe Search **API**
+- Google Cloud Vision Face Detection **API**
+- Google Firebase Storage
+- Google Firebase Firestore
+- Google Firebase Authentication
+- Google Firebase Functions
