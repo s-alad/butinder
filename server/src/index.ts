@@ -77,6 +77,37 @@ app.post("/check-explicit", async (req: Request, res: Response) => {
     }
 })
 
+app.post("/check-face-exists", async (req: Request, res: Response) => {
+    console.log("-----------------");
+
+    try {
+        let base64Data = req.body.image;
+        if (!base64Data) {
+            console.log("No image found");
+            return res.status(400).json("No image found");
+        }
+
+        base64Data = base64Data.replace(/^data:image\/\w+;base64,/, '');
+        const faces = await client.faceDetection(
+            { image: { content: base64Data } }
+        );
+        const detections = faces[0].faceAnnotations;
+        console.log(detections);
+
+        if (!detections || detections.length === 0) {
+            console.log("No faces found");
+            res.status(400).json("No faces found");
+            return;
+        }
+
+        console.log("Face found");
+        return res.status(200).json("Face found");
+    } catch (error) {
+        console.log(error);
+        res.status(500).json("Internal server error");
+    }
+})
+
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });

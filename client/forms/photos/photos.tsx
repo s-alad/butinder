@@ -17,7 +17,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 import s from './photos.module.scss';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { EXPLICIT } from "@/context/switch";
+import { URI } from "@/context/switch";
 
 interface Props {
     callback?: () => void;
@@ -34,8 +34,8 @@ export default function PhotosForm({ callback }: Props) {
             const reader = new FileReader();
             reader.onload = async () => {
                 const base64 = reader.result?.toString();
-                console.log(EXPLICIT);
-                const response = await fetch(`${EXPLICIT}`, {
+                console.log(URI + "/check-explicit");
+                const response = await fetch(`${URI}/check-explicit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -43,6 +43,32 @@ export default function PhotosForm({ callback }: Props) {
                     body: JSON.stringify({ image: base64 })
                 });
     
+                const data = await response.json();
+                if (response.status === 200) {
+                    resolve(data);
+                } else {
+                    reject(data);
+                }
+            };
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(image);
+        });
+    }
+
+    function checkexistsface(image: File) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const base64 = reader.result?.toString();
+                console.log(URI + "/check-face-exists");
+                const response = await fetch(`${URI}/check-face-exists`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: base64 })
+                });
+                console.log(response);
                 const data = await response.json();
                 if (response.status === 200) {
                     resolve(data);
@@ -84,6 +110,26 @@ export default function PhotosForm({ callback }: Props) {
             });
         }))
         if (failed) {return;}
+
+        // check that at least one image has a face
+        let facefound = false;
+        setStatus("making sure you have a face in at least one image...");
+        await Promise.all(images.map(image => {
+            return checkexistsface(image).then(() => {
+                facefound = true;
+            }).catch(() => {
+                console.log("no face found");
+            });
+        }));
+        if (!facefound) {
+            console.log("no face found");
+            setStatus("no face found");
+            setLoading(false);
+            return;
+        }
+
+
+        // if all good, upload the images
         setStatus("all good! ...");
 
         // put the image in the storage bucket under the user's email
@@ -147,6 +193,7 @@ export default function PhotosForm({ callback }: Props) {
                                                     setPreviewImages({ ...previewImaages, [index]: e.target!.result as string });
                                                 }
                                                 reader.readAsDataURL(file);
+                                                console.log(e.target.files?.[0]);
                                                 onChange(e.target.files?.[0])
                                             }}
                                         />
