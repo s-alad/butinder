@@ -128,6 +128,7 @@ export default function PhotosForm({ callback }: Props) {
             return;
         }
 
+        // this should in reality be done server side
 
         // if all good, upload the images
         setStatus("all good! ...");
